@@ -21,6 +21,8 @@ to the minimum number of generators of `m`.
 * `IsLocalRing.embDim_Quotient_span_singleton`: if `x ∈ m \ m²` then
 `embDim R = embDim R ⧸ x + 1`
 
+## Notation
+* `maxl R` is notation for the maximal ideal of a local ring `R`.
 -/
 
 local notation3:max "maxl" A => (IsLocalRing.maximalIdeal A)
@@ -28,20 +30,19 @@ open IsLocalRing
 open Submodule
 open Cardinal
 
-/-- The embedding dimension of a local ring `R` with maximal ideal `m` is
-the dimension of `m ⧸ m²`. -/
+/--Definition: The embedding dimension of a local ring `R` with maximal ideal `m` is the dimension
+  of `m ⧸ m²`. -/
 noncomputable def IsLocalRing.embDim (R : Type*) [CommRing R] [IsLocalRing R]
     : ℕ :=
   Module.finrank (ResidueField R) (CotangentSpace R)
 
--- This is proving that a (nontrivial) quotient of a local ring is a local ring
+/--Lemma: A (nontrivial) quotient of a local ring is a local ring-/
 instance {R : Type*} [CommRing R] [IsLocalRing R] {I : Ideal R} [Nontrivial (R ⧸ I)] :
     IsLocalRing (R ⧸ I) :=
   IsLocalRing.of_surjective' (Ideal.Quotient.mk I) Ideal.Quotient.mk_surjective
 
--- Ideal.Quotient.mk is the map from R to R/I
--- This theorem is saying that the preimage (Ideal.comap) of the maximal ideal in R/I is the maximal
--- ideal in R.
+/--Lemma: If `R` is a local ring and `I ⊆ R` is an ideal, then the preimage of the maximal ideal in
+`R/I` under the map `R -> R/I` (i.e., `Ideal.Quotient.mk I`) is the maximal ideal in `R`.-/
 theorem IsLocalRing.Quotient_comap_maximalIdeal
     {R : Type*} [CommRing R] [IsLocalRing R] (I : Ideal R) [Nontrivial (R ⧸ I)] :
     Ideal.comap (Ideal.Quotient.mk I) (maximalIdeal (R ⧸ I)) = (maximalIdeal R) := by
@@ -49,8 +50,8 @@ theorem IsLocalRing.Quotient_comap_maximalIdeal
     Ideal.comap_isMaximal_of_surjective (Ideal.Quotient.mk I) Ideal.Quotient.mk_surjective
   exact eq_maximalIdeal this
 
--- This theorem is saying that the image (Ideal.map) of the maximal ideal in R is the maximal
--- ideal in R/I.
+/--Lemma: If `R` is a local ring and `I ⊆ R` is an ideal, then under the map `R->R/I` the image of
+the maximal ideal of `R` is the maximal ideal of `R/I`.-/
 theorem IsLocalRing.Quotient_map_maximalIdeal
     {R : Type*} [CommRing R] [IsLocalRing R] (I : Ideal R) [Nontrivial (R ⧸ I)] :
     Ideal.map (Ideal.Quotient.mk I) (maximalIdeal R) = (maximalIdeal (R ⧸ I)) := by
@@ -59,8 +60,8 @@ theorem IsLocalRing.Quotient_map_maximalIdeal
   rw[IsLocalRing.Quotient_comap_maximalIdeal] at this
   exact this
 
--- Lemma: if σ : M → N is an injective R-module map and p ⊆ M is a submodule,
--- then spanRank(σ(p)) ≤ spanRank(p).
+/--Lemma: if `σ : M → N` is an injective `R`-module map and `p ⊆ M` is a submodule, then
+`spanRank(σ(p)) ≤ spanRank(p).`-/
 lemma Submodule.spanRank_injective_map_le.{u} {R : Type*} [CommRing R] {M : Type u} {N : Type u}
 [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N] (σ : M →ₗ[R] N) (p : Submodule R M)
 (hσ : Function.Injective σ) :
@@ -76,8 +77,8 @@ lemma Submodule.spanRank_injective_map_le.{u} {R : Type*} [CommRing R] {M : Type
   rw[this]
   exact b
 
--- Lemma: if σ : M → N is an injective R-module map and p ⊆ M is a submodule,
--- then spanRank(p) ≤ spanRank(σ(p)).
+/-- Lemma: if `σ : M → N` is an injective `R`-module map and `p ⊆ M` is a submodule, then
+`spanRank(p) ≤ spanRank(σ(p)).`-/
 lemma Submodule.spanRank_injective_map_le'.{u} {R : Type*} [CommRing R] {M : Type u} {N : Type u}
 [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N] (σ : M →ₗ[R] N) (p : Submodule R M)
 (hσ : Function.Injective σ) :
@@ -109,8 +110,8 @@ lemma Submodule.spanRank_injective_map_le'.{u} {R : Type*} [CommRing R] {M : Typ
   rw[s's, hs1] at b
   exact b
 
--- Lemma: if σ : M → N is an injective R-module map and p ⊆ M is a submodule,
--- then spanRank(p) = spanRank(σ(p)).
+/--Lemma: If `σ : M → N` is an injective `R`-module map and `p ⊆ M` is a submodule, then
+`spanRank(p) = spanRank(σ(p)).`-/
 theorem Submodule.spanRank_injective_map.{u} {R : Type*} [CommRing R] {M : Type u} {N : Type u}
 [AddCommGroup M] [Module R M] [AddCommGroup N] [Module R N] (σ : M →ₗ[R] N) (p : Submodule R M)
 (hσ : Function.Injective σ) :
@@ -118,8 +119,8 @@ theorem Submodule.spanRank_injective_map.{u} {R : Type*} [CommRing R] {M : Type 
   le_antisymm_iff.mpr
     ⟨spanRank_injective_map_le' σ p hσ, spanRank_injective_map_le σ p hσ⟩
 
---Lemma: if M is an R-module and N ⊆ M is an R-submodule,
--- then spanRank(N) = spanRank(⊤ : Submodule R N).
+/--Lemma: if `M` is an `R`-module and `N ⊆ M` is an `R`-submodule, then
+`spanRank(N) = spanRank(⊤ : Submodule R N)`.-/
 lemma Submodule.spanRank_eq_spanRank_Top {R : Type*} [CommRing R] {M : Type*}
 [AddCommGroup M] [Module R M] (N : Submodule R M) :
     spanRank N = (⊤ : Submodule R N).spanRank := by
@@ -128,6 +129,8 @@ lemma Submodule.spanRank_eq_spanRank_Top {R : Type*} [CommRing R] {M : Type*}
     (⊤ : Submodule R N) (injective_subtype N)
   rw[h2, h1]
 
+/--Lemma: If `M` is an `R`-module and `N ⊆ M` is an `R`-submodule, then
+`spanFinrank(N) = spanFinrank(⊤ : Submodule R N)`.-/
 lemma Submodule.SpanFinRankOfSubmodule_eq_spanFinrankOfTop
     (R : Type*) [CommRing R] [IsNoetherianRing R] (M : Type*)
     [AddCommGroup M] [Module R M] [Module.Finite R M] (N : Submodule R M) :
@@ -141,7 +144,7 @@ lemma Submodule.SpanFinRankOfSubmodule_eq_spanFinrankOfTop
     exact spanRank_eq_spanRank_Top N
   exact Nat.cast_injective this
 
---Lemma: For a finite dimensional vector space over a field, finrank(V) = spanFinrank(V)
+--Lemma: For a finite dimensional vector space `V` over a field, `finrank(V) = spanFinrank(V)`.
 lemma Module.Finrank_eq_spanFinrankOfTop
     (k : Type*) [Field k] (V : Type*) [AddCommGroup V] [Module k V] [Module.Finite k V] :
     Module.finrank k V = (⊤ : Submodule k V).spanFinrank := by
@@ -153,7 +156,7 @@ lemma Module.Finrank_eq_spanFinrankOfTop
   rw [rank_eq_spanRank, spanrank_eq_spanFinrank, Nat.cast_inj] at finrank_eq_rank
   exact finrank_eq_rank
 
-/-- the embedding dimension of `R` is equal to the minimum number of generators of `m`.-/
+/--Theorem: If `(R,m)` is a noetherian local ring, then `embDim R = spanFinrank(m)`.-/
 theorem IsLocalRing.embDim_eq_spanFinrank_maximalIdeal
     (R : Type*) [CommRing R] [IsLocalRing R] [IsNoetherianRing R] :
     IsLocalRing.embDim R = (maxl R).spanFinrank := by
@@ -232,10 +235,15 @@ theorem IsLocalRing.embDim_eq_spanFinrank_maximalIdeal
       exact Eq.symm ((fun {a b} ↦ ENat.coe_inj.mp) (id (Eq.symm s_card)))
     linarith
 
+/--Lemma: If `x ∈ I/I^2` and `y ∈ I` is a choice of representative for `x` (i.e.,
+`y= Quotient.out x`), then the image of `y` under `I -> I/I^2` is `x`
+(i.e., `x = I.toCotangent y`). -/
 theorem Ideal.toCotangent_out {R : Type*} [CommRing R] (I : Ideal R) (x : I.Cotangent) :
     I.toCotangent (Quotient.out x) = x := by
   rw[Ideal.toCotangent_apply I, ← Submodule.Quotient.mk''_eq_mk, Quotient.out_eq']
 
+/--Lemma: If `R` is a noetherian local ring and `x ∈ m \ m^2`, then there exists a
+minimal generating set `s ⊆ R` of `m` which contains `x`.-/
 theorem IsLocalRing.ContangentSpace_extend_singleton_basis
     {R : Type*} {x : R} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
     (hx1 : x ∈ (maxl R)) (hx2 : x ∉ ((maxl R)^2)) :
@@ -247,15 +255,15 @@ theorem IsLocalRing.ContangentSpace_extend_singleton_basis
   let s' : Set ((maxl R).Cotangent) := {(maxl R).toCotangent x'}
   have t : (maxl R).toCotangent x' ∈ s' := rfl
   have li : LinearIndepOn (ResidueField R) id s' := LinearIndepOn.id_singleton (ResidueField R) this
-  let B := Basis.extend li
+  let B := Module.Basis.extend li
   let S := Set.range (DFunLike.coe B)
-  have Srw := Basis.range_extend li
+  have Srw := Module.Basis.range_extend li
   change S = li.extend (Set.subset_univ s') at Srw
-  have s'sub := Basis.subset_extend li
+  have s'sub := Module.Basis.subset_extend li
   rw[← Srw] at s'sub
   have hxS : (maxl R).toCotangent x' ∈ S := s'sub t
-  have Sspan : span (ResidueField R) S = ⊤ := Basis.span_eq B
-  have Scard := Basis.mk_eq_rank'' B
+  have Sspan : span (ResidueField R) S = ⊤ := Module.Basis.span_eq B
+  have Scard := Module.Basis.mk_eq_rank'' B
   have a := IsLocalRing.embDim_eq_spanFinrank_maximalIdeal R
   unfold embDim at a
   have b : Module.rank (ResidueField R) (maxl R).Cotangent =
@@ -268,9 +276,9 @@ theorem IsLocalRing.ContangentSpace_extend_singleton_basis
   rw[← c] at Scard
   clear a b c Srw t s'sub
   let S' := S \ {(maxl R).toCotangent x'}
-  have a : S = S' ∪ {(maxl R).toCotangent x'} := by simp_all only [ne_eq, Basis.coe_extend,
-  Subtype.range_coe_subtype, Set.setOf_mem_eq, mk_fintype, Set.union_singleton,
-  Set.insert_diff_singleton, Set.insert_eq_of_mem, x', S, s', B, S']
+  have a : S = S' ∪ {(maxl R).toCotangent x'} := by simp_all only [ne_eq, Module.Basis.coe_extend,
+    Subtype.range_coe_subtype, Set.setOf_mem_eq, mk_fintype, Set.union_singleton,
+    Set.insert_diff_singleton, Set.insert_eq_of_mem, x', S, s', B, S']
   have S'card : #S = #S' + 1 := by
     have b := mk_singleton ((maxl R).toCotangent x')
     rw[← b, a]
@@ -293,8 +301,8 @@ theorem IsLocalRing.ContangentSpace_extend_singleton_basis
       have a : ((maxl R).toCotangent x') ∈ (maxl R).toCotangent '' s'' :=
         Set.mem_image_of_mem (⇑(maxl R).toCotangent) hc
       rw[b] at a
-      have c : ((maxl R).toCotangent x') ∉ S \ {(maxl R).toCotangent x'} :=
-        Set.notMem_diff_of_mem rfl
+      have c : ((maxl R).toCotangent x') ∉ S \ {(maxl R).toCotangent x'} := by
+        exact Set.not_mem_diff_of_mem rfl
       exact c a
     exact Set.disjoint_singleton_right.mpr d
   rw[a, ← S'card, Scard] at scard
@@ -307,9 +315,9 @@ theorem IsLocalRing.ContangentSpace_extend_singleton_basis
       refine Function.LeftInverse.image_image ?_ S'
       exact Ideal.toCotangent_out (maxl R)
     rw[b] at a
-    have c : S' ∪ ⇑(maxl R).toCotangent '' {x'} = S := by simp_all only [ne_eq, Basis.coe_extend,
-      Subtype.range_coe_subtype, Set.setOf_mem_eq, mk_fintype, Set.union_singleton,
-      Set.insert_diff_singleton, Set.insert_eq_of_mem, Set.image_singleton,
+    have c : S' ∪ ⇑(maxl R).toCotangent '' {x'} = S := by simp_all only [ne_eq,
+      Module.Basis.coe_extend, Subtype.range_coe_subtype, Set.setOf_mem_eq, mk_fintype,
+      Set.union_singleton, Set.insert_diff_singleton, Set.insert_eq_of_mem, Set.image_singleton,
       s', S', x', S, B, s, s'']
     rw[c] at a
     exact a
@@ -325,11 +333,13 @@ theorem IsLocalRing.ContangentSpace_extend_singleton_basis
   constructor
   · rw[@Cardinal.mk_image_eq (maxl R) R (maxl R).subtype s (injective_subtype maxl R)]
     exact scard
-  simp_all only [ne_eq, Basis.coe_extend, Subtype.range_coe_subtype, Set.setOf_mem_eq, mk_fintype,
-    Set.union_singleton, Set.insert_diff_singleton, Set.insert_eq_of_mem, subtype_apply,
+  simp_all only [ne_eq, Module.Basis.coe_extend, Subtype.range_coe_subtype, Set.setOf_mem_eq,
+    mk_fintype, Set.union_singleton, Set.insert_diff_singleton, Set.insert_eq_of_mem, subtype_apply,
     Set.mem_image, Set.mem_insert_iff, Set.mem_diff, Set.mem_singleton_iff, exists_eq_or_imp,
     exists_exists_and_eq_and, true_or, S, B, s', S', s'', x', s]
 
+/--Lemma: If `(R,m)` is a noetherian local ring and `R/x` is nontrivial, then
+`spanRank(m) ≤ spanrank(m/xm)+1`-/
 theorem IsLocalRing.embDim_quot_singleton
 {R : Type*} {x : R} [CommRing R] [IsLocalRing R] [Nontrivial (R ⧸ Ideal.span {x})] :
     (maxl R).spanRank ≤ (maxl (R ⧸ Ideal.span {x})).spanRank + 1 := by
@@ -364,6 +374,8 @@ theorem IsLocalRing.embDim_quot_singleton
     @add_le_add_right Cardinal _ _ _ #s' #s ss' 1
   exact Preorder.le_trans (spanRank maxl R) (#s' + 1) (#s + 1) b this
 
+/--Lemma: If `(R,m)` is a noetherian local ring such that `R/x` is nontrivial and `x ∈ m \ m^2`,
+then `spanRank(m) ≥ spanrank(m/xm)+1`.-/
 lemma IsLocalRing.embDim_quot_singleton'
 {R : Type*} {x : R} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
 [Nontrivial (R ⧸ Ideal.span {x})] (hx1 : x ∈ (maxl R)) (hx2 : x ∉ ((maxl R)^2)) :
@@ -405,17 +417,19 @@ lemma IsLocalRing.embDim_quot_singleton'
   rw[← hs.2.1]
   exact this
 
+/--Lemma: If `R` is a noetherian ring and `I ⊆ R` is an ideal, then `spanRank(I) = spanFinrank(I)`.
+-/
 lemma IsNoetherianRing.Ideal_spanRank_eq_spanFinrank
     {R : Type*} [CommRing R] [IsNoetherianRing R] (I : Ideal R) :
     I.spanRank = I.spanFinrank :=
   Submodule.fg_iff_spanRank_eq_spanFinrank.mpr (IsNoetherian.noetherian I)
 
-/-- if `x ∈ m \ m²` then `embDim R = embDim R ⧸ x + 1` -/
+/--Theorem: If `(R,m)` is a noetherian local ring and `x ∈ m \ m²`,
+then `embDim R = embDim R ⧸ x + 1` -/
 theorem IsLocalRing.embDim_Quotient_span_singleton.{u}
 {R : Type u} {x : R} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
 [Nontrivial (R ⧸ Ideal.span {x})] (hx1 : x ∈ (maxl R)) (hx2 : x ∉ ((maxl R)^2)) :
     (IsLocalRing.embDim R) = IsLocalRing.embDim (R ⧸ Ideal.span {x}) + 1 := by
-
   rw[IsLocalRing.embDim_eq_spanFinrank_maximalIdeal, IsLocalRing.embDim_eq_spanFinrank_maximalIdeal]
   have sreq : (maxl R).spanRank = (maxl (R ⧸ Ideal.span {x})).spanRank + 1 :=
     le_antisymm_iff.mpr

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Brian Nugent, Jarod Alper
 -/
 
+import «RegularLocalRings».EmbeddingDimension
 import «RegularLocalRings».LocalRingDimension
 import Mathlib.RingTheory.DiscreteValuationRing.TFAE
 import Mathlib.RingTheory.KrullDimension.Field
@@ -20,21 +21,23 @@ import Mathlib.RingTheory.KrullDimension.Field
 regular, then `R ⧸ x` is regular. This is used to inductively prove things about regular local
 rings
 * `IsRegularLocalRing.ringKrullDim_zero_IsField`: A regular local ring of dimension 0 is a field
+* `IsRegularLocalRing.IsDomain`: A regular local ring is an integral domain.
 * `IsLocalRing.IsDiscreteValuationRing_iff_IsRegularLocalRing_ringKrullDim_one` : A regular local
 ring of dimension 1 is a discrete valuation ring.
-* `IsRegularLocalRing.IsDomain`: A regular local ring is an integral domain.
 
+## Notation
+* `maxl R` is notation for the maximal ideal of a local ring `R`.
 -/
 
 local notation3:max "maxl" A => (IsLocalRing.maximalIdeal A)
 
-/-- A commutative local noetherian ring `R` is regular if its embedding dimension equals
+/-- Definition: A commutative local noetherian ring `R` is regular if its embedding dimension equals
 its Krull dimension -/
 class IsRegularLocalRing (R : Type*) [CommRing R] : Prop extends
 IsLocalRing R, IsNoetherianRing R where
   reg : IsLocalRing.embDim R = ringKrullDim R
 
-/-- If `x ∈ m \ m²` and R is regular, then `R ⧸ x` is regular. -/
+/-- Theorem: If `(R,m)` is a regular local ring and `x ∈ m \ m²`, then `R ⧸ x` is regular. -/
 theorem IsRegularLocalRing.Quotient_span_singleton_IsRegularLocalRing
 {R : Type*} [CommRing R] [hreg : IsRegularLocalRing R] (x : R) [Nontrivial (R ⧸ (Ideal.span {x}))]
 (hx1 : x ∈ maxl R) (hx2 : x ∉ (maxl R)^2) :
@@ -63,7 +66,7 @@ theorem IsRegularLocalRing.Quotient_span_singleton_IsRegularLocalRing
     Nat.le_of_lt_succ natle
   exact Nat.cast_le.mpr natle'
 
-/-- A regular local ring of dimension 0 is a field -/
+/-- Theorem: A regular local ring of dimension 0 is a field -/
 lemma IsRegularLocalRing.ringKrullDim_zero_IsField
     (R : Type*) [CommRing R] [hR : IsRegularLocalRing R] (kd0 : ringKrullDim R = 0) :
     IsField R := by
@@ -75,6 +78,8 @@ lemma IsRegularLocalRing.ringKrullDim_zero_IsField
   have mBot := Submodule.spanRank_eq_zero_iff_eq_bot.mp SPzero
   exact IsLocalRing.isField_iff_maximalIdeal_eq.mpr (id (mBot))
 
+/--Lemma: If `R` is a noetherian local ring and `x` is a prime element not contained in any
+minimal prime, then `R` is a domain.-/
 lemma IsLocalRing.IsNoetherianRing_span_singleton_IsPrime_not_minimalPrimes_IsDomain
 {R : Type*} [CommRing R] [IsLocalRing R] [IsNoetherianRing R]
 (x : R) [hx : (Ideal.span {x}).IsPrime] (notMin : ¬Ideal.span {x} ∈ minimalPrimes R) :
@@ -132,6 +137,7 @@ lemma IsLocalRing.IsNoetherianRing_span_singleton_IsPrime_not_minimalPrimes_IsDo
   rw[qeqZero] at qPrime
   exact IsDomain.of_bot_isPrime R
 
+/--Inductive hypothesis:  If `R` is a regular local ring of dimension `n`, then `R` is a domain. -/
 theorem IsRegularLocalRing.IsDomain_Induction :
     ∀(n : ℕ) (R : Type*) [CommRing R] [IsRegularLocalRing R]
     (_ : Submodule.spanFinrank (maxl R) = n), IsDomain R := by
@@ -225,7 +231,7 @@ theorem IsRegularLocalRing.IsDomain_Induction :
       @Submodule.eq_bot_of_le_smul_of_le_jacobson_bot R R _ _ _ (maxl R) (maxl R) mFG mlem2 mlejac
     exact ringKrullDim_eq_zero_of_isField (IsLocalRing.isField_iff_maximalIdeal_eq.mpr mbot)
 
-/-- Regular local rings are integral domains. -/
+/-- Theorem: Regular local rings are integral domains. -/
 theorem IsRegularLocalRing.IsDomain
 {R : Type*} [CommRing R] [IsRegularLocalRing R] :
     IsDomain R :=
@@ -235,7 +241,7 @@ instance inst_IsRegularLocalRing_IsDomain
 {R : Type*} [CommRing R] [IsRegularLocalRing R] :
     IsDomain R := IsRegularLocalRing.IsDomain
 
-/-- A regular local ring of dimension `1` is a discrete valuation ring. -/
+/-- Theorem: A regular local ring of dimension `1` is a discrete valuation ring. -/
 theorem IsLocalRing.IsDiscreteValuationRing_iff_IsRegularLocalRing_ringKrullDim_one
     (R : Type*) [CommRing R] [hR : IsRegularLocalRing R] :
     ringKrullDim R = 1 → IsDiscreteValuationRing R := by
